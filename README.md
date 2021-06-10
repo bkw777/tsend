@@ -1,5 +1,5 @@
 # tsend
-Powershell implementation of the bootstrap function in [dlplus](https//github.com/bkw777/dlplus) and [mComm](http://www.club100.org/memfiles/index.php?&direction=0&order=&directory=Kurt%20McCullum)
+Powershell implementation of the bootstrap function in [dlplus](https://github.com/bkw777/dlplus) and [mComm](http://www.club100.org/memfiles/index.php?&direction=0&order=&directory=Kurt%20McCullum)
 
 Usage:  
     `.\tsend.ps1 -file TS-DOS.100`  
