@@ -1,5 +1,5 @@
 # tsend.ps1
-# Powershell implementation of a bootstrapper for "Model T Computers"
+# Powershell implementation of a bootstrapper for "Model T" computers.
 #
 # Reads a local file and writes it out to a serial port, one byte at a time
 # with a 6ms pause after each byte, and sends a trailing Ctrl-Z at the end.
@@ -7,9 +7,7 @@
 # Usage (example):
 # .\tsend.ps1 -port COM5 -file TS-DOS.100
 #
-# If port is omitted, and there is only one serial port detected, it is used
-# If port is omitted, and there are more than one serial ports detected, the detected ports are displayed and the user is prompted to select one.
-# If file is omitted, the user is prompted to supply a flename.
+# -port may be omitted if there is only one serial port present
 
 param (
 	[string]$port,
@@ -27,7 +25,6 @@ if($port -eq ""){
 	if($ports.count -gt 1) {
 		Write-Host "Multiple serial ports detected."
 		Write-Host "Specify -port COM#"
-		#Write-Host "Detected serial ports:"
 		$portList = get-pnpdevice -class Ports -ea 0
 		foreach($device in $portList) {
 			if ($device.Present) {
@@ -46,8 +43,8 @@ if($file -eq ""){
 
 Write-Host ""
 Write-Host "Prepare the portable to receive. Hints:"
-Write-Host "	RUN `"COM:98N1ENN`"		# for TRS-80, TANDY, Kyotronic, Olivetti"
-Write-Host "	RUN `"COM:9N81XN`"		# for NEC"
+Write-Host "	RUN `"COM:98N1ENN`"		# TRS-80, TANDY, Kyotronic, Olivetti"
+Write-Host "	RUN `"COM:9N81XN`"		# NEC"
 Write-Host ""
 Read-Host "Press Enter when the portable is ready..."
 
