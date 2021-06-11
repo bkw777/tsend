@@ -33,4 +33,8 @@ If there is more than one serial port, it will display a list of all serial port
     
 Now you can use [LaddieAlpha](http://bitchin100.com/wiki/index.php?title=LaddieCon#LaddieAlpha) to share files with the portable.
 
+![](tsend_1.jpg)
+![](tsend_2.jpg)
+![](tsend_3.jpg)
+
 Keywords: TRS-80 TANDY Model 100 102 200 Kyotronic KC-85 NEC PC-8201 PC-8300 Olivetti M-10 TEENY TS-DOS DKSMGR TPDD LaddieCon LaddieAlpha mComm dlplus
