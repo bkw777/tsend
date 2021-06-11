@@ -71,8 +71,8 @@ foreach ($byte in $bytes) {
 	$p.write($byte,0,1)
 	# update the progress indicator once every 100 bytes
 	if($x++ -gt 99){
-		$pc = [math]::round(($i/$bytes.count)*100)
-		Write-Progress -PercentComplete $pc
+		$pc = [math]::round($i/$bytes.count*100)
+		Write-Progress -Activity "Sending $file" -PercentComplete $pc
 		$x = 0
 	}
 	# sleep 6 ms
