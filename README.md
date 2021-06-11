@@ -9,9 +9,9 @@ So, this provides another option to bootstrap BASIC loaders into TRS-80 Model 10
 
 This writes a specified file out on a specified serial port, one byte at a time with a 6ms pause after each byte sent, followed by a trailing 0x1A (Ctrl-Z) at the end of the file. It's meant to be fed into a `RUN "COM:..."` or `LOAD "COM:..."` command in BASIC on the portable.
 
-Typical uses (files that you need to send this way):
-* [TPDD clients](https://github.com/bkw777/dlplus/tree/master/clients)
-* [REX* setup files](http://bitchin100.com/wiki/index.php?title=REX)
+Typical uses (files that you would need to send this way):
+* [TPDD client installers](https://github.com/bkw777/dlplus/tree/master/clients)
+* [REX setup files](http://bitchin100.com/wiki/index.php?title=REX)
 
 ## Usage
 Download tsend.ps1 and one of the files above, for instance TS-DOS.100.
