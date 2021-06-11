@@ -56,7 +56,7 @@ Write-Host ""
 Read-Host "Press Enter when the portable is ready"
 
 # read the payload file
-[byte[]] $bytes = Get-Content $file -encoding byte -readcount 0
+$payload = Get-Content -path $file -raw
 
 # open the serial port
 $p = new-Object System.IO.Ports.SerialPort $port,19200,None,8,one
@@ -69,13 +69,11 @@ catch {
 }
 
 # dribble the payload out the serial port
-$i = 0
-$size = $bytes.count
+$size = $payload.length
 $self = $MyInvocation.InvocationName
-foreach ($byte in $bytes) {
-	$i++
+for ($i = 0; $i -lt $size ; $i++) {
 	# write one byte
-	$p.write($byte,0,1)
+	$p.write($payload,$i,1)
 	# progress indicator
 	# doing this every byte is slow, but we want this to go slow anyway
 	$pc = [math]::round($i/$size*100)
