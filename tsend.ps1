@@ -53,28 +53,33 @@ Write-Host "Prepare the portable to receive. Hints:"
 Write-Host "	RUN `"COM:98N1ENN`"	# for TRS-80, TANDY, Kyotronic, Olivetti"
 Write-Host "	RUN `"COM:9N81XN`"	# for NEC"
 Write-Host ""
-Read-Host "Press Enter when the portable is ready..."
+Read-Host "Press Enter when the portable is ready"
 
 # read the payload file
 [byte[]] $bytes = Get-Content $file -encoding byte -readcount 0
 
 # open the serial port
 $p = new-Object System.IO.Ports.SerialPort $port,19200,None,8,one
-$p.open()
+try {
+	$p.open()
+}
+catch {
+	Write-Host "Failed to open $port"
+	exit 1
+}
 
 # dribble the payload out the serial port
-$x = 0
 $i = 0
+$size = $bytes.count
+$self = $MyInvocation.InvocationName
 foreach ($byte in $bytes) {
 	$i++
 	# write one byte
 	$p.write($byte,0,1)
-	# update the progress indicator once every 100 bytes
-	if($x++ -gt 99){
-		$pc = [math]::round($i/$bytes.count*100)
-		Write-Progress -Activity "Sending $file" -PercentComplete $pc
-		$x = 0
-	}
+	# progress indicator
+	# doing this every byte is slow, but we want this to go slow anyway
+	$pc = [math]::round($i/$size*100)
+	Write-Progress -Activity "$self" -Status "Sending $file on $port    $i/$size bytes" -PercentComplete $pc
 	# sleep 6 ms
 	Start-Sleep -milliseconds $char_delay_ms
 }
