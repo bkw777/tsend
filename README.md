@@ -1,7 +1,7 @@
 # tsend
 Powershell implementation of the bootstrap function in [dlplus](https://github.com/bkw777/dlplus) and [mComm](http://www.club100.org/memfiles/index.php?&direction=0&order=&directory=Kurt%20McCullum)
 
-dplus only runs on linux or osx or any other unix-like OS,  
+dlplus only runs on linux or osx or any other unix-like OS,  
 the bootstrapper in mComm for Windows doesn't seem to work in current Windows versions,  
 and the File-> Send file... option in TeraTerm doesn't work either.
 
