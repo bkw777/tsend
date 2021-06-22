@@ -31,7 +31,7 @@ Finally run the script.
 If there is more than one serial port, it will display a list of all serial ports and you will need to re-run with "-port COM#" added to the command line. Example:  
     `.\tsend.ps1 -port COM6 -file TS-DOS.100`  
     
-Now you can use [LaddieAlpha](http://bitchin100.com/wiki/index.php?title=LaddieCon#LaddieAlpha) to share files with the portable.
+Then you could use [LaddieAlpha](http://bitchin100.com/wiki/index.php?title=LaddieCon#LaddieAlpha) to share files with the portable.
 
 ![](tsend_1.jpg)
 ![](tsend_2.jpg)
