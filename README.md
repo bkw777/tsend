@@ -18,7 +18,7 @@ Download tsend.ps1 and one of the files above, for instance TS-DOS.100.
 
 Open a powershell window and cd to the directory where you downloaded the files.
 
-Tell Windows to allow the script to run by running these command in the powershell window.  
+Tell Windows to allow the script to run by running these 2 commands in the powershell window.  
 You only need to do these one time the first time after you download the file, not every time you want to run it after that.
 ```
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
