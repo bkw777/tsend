@@ -3,7 +3,7 @@
 # b.kenyon.w@gmail.com
 #
 # Reads a local file and writes it out to a serial port, one byte at a time
-# with a 8ms pause after each byte, and sends a trailing Ctrl-Z at the end.
+# with a 7ms pause after each byte, and sends a trailing Ctrl-Z at the end.
 #
 # Usage (example):
 # .\tsend.ps1 -port COM5 -file TS-DOS.100
@@ -16,7 +16,7 @@ param (
 	[string]$file
 )
 
-$char_delay_ms = 8
+$char_delay_ms = 7
 [byte] $basic_eof = 0x1A
 
 if($port -eq ""){
