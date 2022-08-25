@@ -3,7 +3,7 @@
 # b.kenyon.w@gmail.com
 #
 # Reads a local file and writes it out to a serial port, one byte at a time
-# with a 6ms pause after each byte, and sends a trailing Ctrl-Z at the end.
+# with a 8ms pause after each byte, and sends a trailing Ctrl-Z at the end.
 #
 # Usage (example):
 # .\tsend.ps1 -port COM5 -file TS-DOS.100
