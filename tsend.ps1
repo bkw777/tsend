@@ -16,7 +16,7 @@ param (
 	[string]$file
 )
 
-$char_delay_ms = 6
+$char_delay_ms = 8
 [byte] $basic_eof = 0x1A
 
 if($port -eq ""){
