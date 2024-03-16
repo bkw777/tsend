@@ -1,16 +1,16 @@
 # tsend
-Powershell implementation of the bootstrap function in [dlplus](https://github.com/bkw777/dlplus) and [mComm](http://www.club100.org/memfiles/index.php?&direction=0&order=&directory=Kurt%20McCullum)
+Powershell implementation of the bootstrap function in [dl2](https://github.com/bkw777/dl2) and [mComm](http://www.club100.org/memfiles/index.php?&direction=0&order=&directory=Kurt%20McCullum)
 
-dlplus only runs on linux or osx or any other unix-like OS,  
+dl2 only runs on linux or osx or any other unix-like OS, or on windows but requires cygwin or msys2,  
 the bootstrapper in mComm for Windows doesn't seem to work in current Windows versions,  
-and the File-> Send file... option in TeraTerm doesn't work either.
+and the File-> Send file... option in TeraTerm doesn't work either, you have to actually paste the file in the terminal.
 
 So, this provides another option to bootstrap BASIC loaders into TRS-80 Model 100-alikes reliably from Windows.
 
 This writes a specified file out on a specified serial port, one byte at a time with a 6ms pause after each byte sent, followed by a trailing 0x1A (Ctrl-Z) at the end of the file. It's meant to be fed into a `RUN "COM:..."` or `LOAD "COM:..."` command in BASIC on the portable.
 
 Typical uses (files that you would need to send this way):
-* [TPDD client installers](https://github.com/bkw777/dlplus/tree/master/clients)
+* [TPDD client installers](https://github.com/bkw777/dl2/tree/master/clients)
 * [REX setup files](http://bitchin100.com/wiki/index.php?title=REX)
 
 ## Usage
@@ -39,7 +39,7 @@ The transferred file MUST be a plain ascii text file, and generally specifically
 
 You could use tsend to transfer a generic text document into TELCOM instead of into BASIC, but there is not much reason to do that. tsend is really intended for "bootstrapping", ie getting a program transferred and running on the client from scratch in as few and simple and reliable repeatable steps as possible, so that the program can then take over and do the rest. For general file transfer, use TPDD, which can handle any kind of file and transfers in both directions. tsend is meant to help get a TPDD client installed in the first place, so that you can then use it for everything else.
 
-The name of the file does not matter on the PC side, only the contents. On any KC-85 clone aka "Model T", ascii text files (whether they are generic documents or ascii format BASIC code) always have the extension .DO, tokenized (binary) BASIC files always have the extension .BA , and binary machine-language programs have the extension .CO . But on the internet or your modern pc, any kind of file might have any kind of filename or extension. For instance, the [collection of TPDD client installers bundled with dlplus](https://github.com/bkw777/dlplus/tree/master/clients) have filenames reflecting the machine they target, ex: TS-DOS.100 vs TS-DOS.NEC etc.
+The name of the file does not matter on the PC side, only the contents. On any KC-85 clone aka "Model T", ascii text files (whether they are generic documents or ascii format BASIC code) always have the extension .DO, tokenized (binary) BASIC files always have the extension .BA , and binary machine-language programs have the extension .CO . But on the internet or your modern pc, any kind of file might have any kind of filename or extension. For instance, the [collection of TPDD client installers bundled with dl2](https://github.com/bkw777/dl2/tree/master/clients) have filenames reflecting the machine they target, ex: TS-DOS.100 vs TS-DOS.NEC etc.
 
 On the internet, many BASIC files are archived with a .BA extension even though they are really ascii files and would require a .DO extension if they were on the portable. This can cause confusion until you know about it, but it was done for a few different valid reasons. Any place other than on the portable or in an emulator, the tokenized .BA files are not directly readable or usable. For archival and reference purposes, the ascii version is more useful. It's like the source .c file to a compiled executable. On the portable, the ascii version of FOO.BA would normally be FOO.DO, but many programs already had an accompanying file named FOO.DO for the documentation. So, it became somewhat of a convention to store BASIC files on bulletin boards and the internet in ascii format but with a .BA extension. The file contains the readable ascii BASIC source code, and outside of the target machine or emulator the .BA extension is just intended to document that the contents are a BASIC program rather than the manual, but not tokenized BASIC.
 
@@ -69,4 +69,4 @@ SAVE "MYPROG"
 ```
 This transfers the ascii BASIC MYPROG.DO into the BASIC interpreter on the 100 as if you typed it in, then saves a binary tokenized BASIC version of it as MYPROG.BA on the 100.
 
-Keywords: TRS-80 TANDY Model 100 102 200 Kyotronic KC-85 NEC PC-8201 PC-8300 Olivetti M-10 TEENY TS-DOS DKSMGR TPDD LaddieCon LaddieAlpha mComm dlplus
+Keywords: TRS-80 TANDY Model 100 102 200 Kyotronic KC-85 NEC PC-8201 PC-8300 Olivetti M-10 TEENY TS-DOS DKSMGR TPDD LaddieCon LaddieAlpha mComm dlplus dl2 Desk-Link
