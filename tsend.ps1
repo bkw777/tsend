@@ -1,9 +1,13 @@
+# UNTESTED XON/XOFF VERSION
+#
 # tsend.ps1
 # Powershell implementation of a bootstrapper for "Model T" computers.
 # b.kenyon.w@gmail.com
 #
-# Reads a local file and writes it out to a serial port, one byte at a time
-# with a small pause after each byte, and sends a trailing Ctrl-Z at the end.
+# Reads a local file and writes it out to a serial port.
+# Sends a trailing Ctrl-Z at the end.
+# The script both sets the pc serial port to 9600,8n1 with xon/xoff flow control,
+# and shows you what to type in BASIC so that the portable does the same.
 #
 # Usage (example):
 # .\tsend.ps1 -port COM5 -file TS-DOS.100
@@ -16,7 +20,7 @@ param (
 	[string]$file
 )
 
-$char_delay_ms = 8
+$char_delay_ms = 0  # not needed with working xon/xoff, otherwise may need anywhere from 5 to 10
 [byte] $basic_eof = 0x1A
 
 if($port -eq ""){
@@ -46,13 +50,15 @@ if($file -eq ""){
 
 Write-Host ""
 Write-Host "Prepare the portable to receive. Hints:"
-Write-Host "	RUN `"COM:98N1ENN`"	# for TRS-80, TANDY, Kyotronic, Olivetti"
-Write-Host "	RUN `"COM:9N81XN`"	# for NEC"
+Write-Host "	RUN `"COM:88N1ENN`"	# for TRS-80, TANDY, Kyotronic, Olivetti"
+Write-Host "	RUN `"COM:8N81XN`"	# for NEC"
 Write-Host ""
 Read-Host "Press Enter when the portable is ready"
 
 $payload = Get-Content -path $file -raw
-$p = new-Object System.IO.Ports.SerialPort $port,19200,None,8,one
+$p = new-Object System.IO.Ports.SerialPort $port,9600,None,8,one
+$p.handshake="XOnXOff"
+
 try {$p.open()}
 catch {
 	Write-Host "Failed to open $port"
@@ -65,7 +71,7 @@ for ($i = 0; $i -lt $size ; $i++) {
 	$p.write($payload,$i,1)
 	$pc = [math]::round($i/$size*100)
 	Write-Progress -Activity "$self" -Status "Sending $file on $port    $i/$size bytes" -PercentComplete $pc
-	Start-Sleep -milliseconds $char_delay_ms
+	if ($char_delay_ms) Start-Sleep -milliseconds $char_delay_ms
 }
 $p.write($basic_eof,0,1)
 
