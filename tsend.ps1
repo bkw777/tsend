@@ -1,4 +1,14 @@
-# UNTESTED XON/XOFF VERSION
+# XON/XOFF VERSION - NOT WORKING
+# The script runs without error, but the xon/xoff is not actually pausing transmission,
+# so the file gets corrupt in transmission and fails to load on the receiving machine.
+# On linux, proper operation requires:
+#   VMIN = 1
+#   VTIME = 0
+#   IXON & IXOFF enabled
+#   IXANY NOT ENABLED
+# I don't know how to do the equivalent of setting these on Windows.
+# TS-DOS.100 fails to load even with the old 8ms delay,
+# but works fine on linux using either dl -b or even just using simple cat after setting stty settings.
 #
 # tsend.ps1
 # Powershell implementation of a bootstrapper for "Model T" computers.
@@ -57,7 +67,9 @@ Read-Host "Press Enter when the portable is ready"
 
 $payload = Get-Content -path $file -raw
 $p = new-Object System.IO.Ports.SerialPort $port,9600,None,8,one
-$p.handshake="XOnXOff"
+$p.handshake = "XOnXOff"
+#$p.ReadTimeout = InfiniteTimeout
+#$p.WriteTimeout = InfiniteTimeout
 
 try {$p.open()}
 catch {
