@@ -71,7 +71,7 @@ for ($i = 0; $i -lt $size ; $i++) {
 	$p.write($payload,$i,1)
 	$pc = [math]::round($i/$size*100)
 	Write-Progress -Activity "$self" -Status "Sending $file on $port    $i/$size bytes" -PercentComplete $pc
-	if ($char_delay_ms) Start-Sleep -milliseconds $char_delay_ms
+	if ($char_delay_ms) { Start-Sleep -milliseconds $char_delay_ms }
 }
 $p.write($basic_eof,0,1)
 
