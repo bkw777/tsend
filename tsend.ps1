@@ -65,9 +65,12 @@ Write-Host "	RUN `"COM:8N81XN`"	# for NEC"
 Write-Host ""
 Read-Host "Press Enter when the portable is ready"
 
-$payload = Get-Content -path $file -raw
+$payload = Get-Content -Path $file -AsByteStream -Raw
+if ($payload[$i]!=$basic_eof) $payload += $basic_eof
+
 $p = new-Object System.IO.Ports.SerialPort $port,9600,None,8,one
 $p.handshake = "XOnXOff"
+
 #$p.ReadTimeout = InfiniteTimeout
 #$p.WriteTimeout = InfiniteTimeout
 
@@ -77,14 +80,21 @@ catch {
 	exit 1
 }
 
+$p.DiscardInBuffer()
+$p.DiscardOutBuffer()
+
 $size = $payload.length
 $self = $MyInvocation.InvocationName
-for ($i = 0; $i -lt $size ; $i++) {
-	$p.write($payload,$i,1)
+for ($i = 0; $i -lt $size ; ) {
+	try {$p.write($payload,$i,1)}
+	catch {
+		Start-Sleep -milliseconds 10
+		continue
+	}
+	$i++
 	$pc = [math]::round($i/$size*100)
 	Write-Progress -Activity "$self" -Status "Sending $file on $port    $i/$size bytes" -PercentComplete $pc
 	if ($char_delay_ms) { Start-Sleep -milliseconds $char_delay_ms }
 }
-$p.write($basic_eof,0,1)
 
 $p.close()
