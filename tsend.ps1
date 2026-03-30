@@ -1,6 +1,6 @@
-# XON/XOFF VERSION - NOT WORKING
-# The script runs without error, but the xon/xoff is not actually pausing transmission,
-# so the file gets corrupt in transmission and fails to load on the receiving machine.
+# XON/XOFF VERSION
+# NOT WORKING - XOFF is not pausing transmission
+#
 # On linux, proper operation requires:
 #   VMIN = 1
 #   VTIME = 0
@@ -31,7 +31,7 @@ param (
 )
 
 $char_delay_ms = 0  # not needed with working xon/xoff, otherwise may need anywhere from 5 to 10
-[byte] $basic_eof = 0x1A
+$basic_eof = [char][byte]0x1A
 
 if($port -eq ""){
 	[string[]]$ports = [System.IO.Ports.SerialPort]::getportnames()
@@ -65,8 +65,8 @@ Write-Host "	RUN `"COM:8N81XN`"	# for NEC"
 Write-Host ""
 Read-Host "Press Enter when the portable is ready"
 
-$payload = Get-Content -Path $file -AsByteStream -Raw
-if ($payload[$i]!=$basic_eof) $payload += $basic_eof
+$payload = Get-Content -Path $file -Raw
+if ($payload[-1] -ne $basic_eof) { $payload += [char][byte]$basic_eof }
 
 $p = new-Object System.IO.Ports.SerialPort $port,9600,None,8,one
 $p.handshake = "XOnXOff"
@@ -83,17 +83,17 @@ catch {
 $p.DiscardInBuffer()
 $p.DiscardOutBuffer()
 
-$size = $payload.length
+$l = $payload.length
 $self = $MyInvocation.InvocationName
-for ($i = 0; $i -lt $size ; ) {
+for ($i = 0; $i -lt $l ; ) {
 	try {$p.write($payload,$i,1)}
 	catch {
 		Start-Sleep -milliseconds 10
 		continue
 	}
 	$i++
-	$pc = [math]::round($i/$size*100)
-	Write-Progress -Activity "$self" -Status "Sending $file on $port    $i/$size bytes" -PercentComplete $pc
+	$pc = [math]::round($i/$l*100)
+	Write-Progress -Activity "$self" -Status "Sending $file on $port    $i/$l bytes" -PercentComplete $pc
 	if ($char_delay_ms) { Start-Sleep -milliseconds $char_delay_ms }
 }
 
