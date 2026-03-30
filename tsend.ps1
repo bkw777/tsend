@@ -1,37 +1,45 @@
-# XON/XOFF VERSION
-# NOT WORKING - XOFF is not pausing transmission
-#
-# On linux, proper operation requires:
-#   VMIN = 1
-#   VTIME = 0
-#   IXON & IXOFF enabled
-#   IXANY NOT ENABLED
-# I don't know how to do the equivalent of setting these on Windows.
-# TS-DOS.100 fails to load even with the old 8ms delay,
-# but works fine on linux using either dl -b or even just using simple cat after setting stty settings.
-#
 # tsend.ps1
 # Powershell implementation of a bootstrapper for "Model T" computers.
 # b.kenyon.w@gmail.com
 #
 # Reads a local file and writes it out to a serial port.
-# Sends a trailing Ctrl-Z at the end.
+# Appends a trailing Ctrl-Z if the file doesn't already include one.
 # The script both sets the pc serial port to 9600,8n1 with xon/xoff flow control,
 # and shows you what to type in BASIC so that the portable does the same.
 #
 # Usage (example):
+# .\tsend.ps1 -file TS-DOS.100
 # .\tsend.ps1 -port COM5 -file TS-DOS.100
+# .\tsend.ps1 -port COM5 -baud 600 -file TS-DOS.100
 #
 # -port is optional. If there is only one serial port present, it will be used automatically.
-# If there are multiple serial ports present, they are displayed so you can re-run with -port. 
+# If there are multiple serial ports present, they are displayed so you can re-run with -port.
+#
+# -baud is optional. Default is 9600. Values: 19200 9600 4800 2400 1200 600 300
+# The COM: stat string in the BASIC prompt will reflect the actual baud rate.
+#
 
 param (
 	[string]$port,
+	[int]$baud = 9600,
 	[string]$file
 )
 
-$char_delay_ms = 0  # not needed with working xon/xoff, otherwise may need anywhere from 5 to 10
+$char_delay_ms = 0
 $basic_eof = [char][byte]0x1A
+$s = @{19200=9;9600=8;4800=7;2400=6;1200=5;600=4;300=3}
+$c = $s[$baud]
+
+function cleanup {
+	if ($p.IsOpen) {
+		#Write-Host "closing $($p.PortName)"
+		$p.DiscardInBuffer()
+		$p.DiscardOutBuffer()
+		$p.close()
+	}
+}
+
+#trap {cleanup;exit}
 
 if($port -eq ""){
 	[string[]]$ports = [System.IO.Ports.SerialPort]::getportnames()
@@ -48,7 +56,7 @@ if($port -eq ""){
 				Write-Host $device.Name "(Manufacturer:"$device.Manufacturer")"
 			}
 		}
-		exit
+		exit 1
 	}
 	$port = $ports[0]
 }
@@ -58,43 +66,56 @@ if($file -eq ""){
 	exit 1
 }
 
-Write-Host ""
-Write-Host "Prepare the portable to receive. Hints:"
-Write-Host "	RUN `"COM:88N1ENN`"	# for TRS-80, TANDY, Kyotronic, Olivetti"
-Write-Host "	RUN `"COM:8N81XN`"	# for NEC"
-Write-Host ""
-Read-Host "Press Enter when the portable is ready"
-
 $payload = Get-Content -Path $file -Raw
 if ($payload[-1] -ne $basic_eof) { $payload += [char][byte]$basic_eof }
 
-$p = new-Object System.IO.Ports.SerialPort $port,9600,None,8,one
+$p = new-Object System.IO.Ports.SerialPort $port,$baud,None,8,one
+
 $p.handshake = "XOnXOff"
+#$p.WriteBufferSize = 128
+#$p.Encoding = [System.Text.Encoding]::GetEncoding(437)
+$p.Encoding = [System.Text.Encoding]::GetEncoding(1252)
+#$p.Encoding = [System.Text.Encoding]::GetEncoding("utf-8")
+#$p.ReadTimeout = 5000
+#$p.WriteTimeout = 5000
 
-#$p.ReadTimeout = InfiniteTimeout
-#$p.WriteTimeout = InfiniteTimeout
+#$p
 
+#Write-Host "Opening $($p.PortName)"
 try {$p.open()}
 catch {
-	Write-Host "Failed to open $port"
+	Write-Host "Failed to open $($p.PortName)"
+	cleanup
 	exit 1
 }
-
 $p.DiscardInBuffer()
 $p.DiscardOutBuffer()
 
-$l = $payload.length
-$self = $MyInvocation.InvocationName
-for ($i = 0; $i -lt $l ; ) {
-	try {$p.write($payload,$i,1)}
-	catch {
-		Start-Sleep -milliseconds 10
-		continue
+#$p
+
+Write-Host ""
+Write-Host "Prepare the portable to receive."
+Write-Host "Type one of the following into BASIC and press Enter:"
+Write-Host ""
+Write-Host "    RUN `"COM:$($c)8N1ENN`"     (TANDY/Olivetti/Kyotronic)"
+Write-Host "    RUN `"COM:$($c)N81XN`"      (NEC)"
+Write-Host ""
+Read-Host "Press Enter here after the portable is ready"
+Write-Host "Sending..."
+
+$fancy = $true
+if ($fancy) {
+	$l = $payload.length
+	$self = $MyInvocation.InvocationName
+	for ($i=0 ; $i -lt $l ; $i++) {
+		$pc = [math]::round($i/$l*100)
+		Write-Progress -Activity "$self" -Status "Sending $file on $port    $i/$l bytes" -PercentComplete $pc
+		$p.write($payload,$i,1)
+		if ($char_delay_ms) { Start-Sleep -milliseconds $char_delay_ms }
 	}
-	$i++
-	$pc = [math]::round($i/$l*100)
-	Write-Progress -Activity "$self" -Status "Sending $file on $port    $i/$l bytes" -PercentComplete $pc
-	if ($char_delay_ms) { Start-Sleep -milliseconds $char_delay_ms }
+} else {
+	$p.write($payload)
 }
 
-$p.close()
+Write-Host "Done"
+cleanup
